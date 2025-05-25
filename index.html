@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>BLACKPINK Birthday Card</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap');
+
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background-color: #000;
+      color: #fff;
+      overflow: hidden;
+    }
+    .screen {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      flex-direction: column;
+      background: url('background.png') no-repeat center center/cover;
+      position: relative;
+    }
+    .screen::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(rgba(0,0,0,0.6), rgba(255,105,180,0.3));
+      z-index: 0;
+    }
+    .hidden {
+      display: none;
+    }
+    .pin-display, .numpad, .blackpink, .wish-container {
+      z-index: 1;
+    }
+    .pin-display {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 20px;
+      gap: 15px;
+    }
+    .pin-dot {
+      width: 30px;
+      height: 40px;
+      border-bottom: 3px solid #fff;
+      text-align: center;
+      font-size: 2rem;
+    }
+    .numpad {
+      display: grid;
+      grid-template-columns: repeat(3, 70px);
+      gap: 15px;
+    }
+    .numpad button {
+      height: 70px;
+      font-size: 1.5rem;
+      background-color: #000;
+      color: #fff;
+      border: 2px solid #ff69b4;
+      border-radius: 15px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .numpad button:hover {
+      background-color: #ff69b4;
+      color: #000;
+    }
+    .confetti {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .wish-container {
+      position: relative;
+      z-index: 1;
+      max-width: 90%;
+      text-align: center;
+      font-size: 1.5rem;
+    }
+    .blackpink {
+      font-family: 'Poppins', sans-serif;
+      font-weight: bold;
+      color: #ff69b4;
+      font-size: 3rem;
+    }
+    @keyframes typing {
+      from { width: 0 }
+      to { width: 100% }
+    }
+    .typed-line {
+      overflow: hidden;
+      white-space: nowrap;
+      border-right: 2px solid #fff;
+      width: 0;
+      animation: typing 2s steps(40, end) forwards;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Page 1: PIN Screen -->
+<div id="pinScreen" class="screen">
+  <h1 class="blackpink">BLACKPINK CARD 💖</h1>
+  <p>Masukkan PIN anda 👇</p>
+  <div class="pin-display" id="pinDisplay">
+    <div class="pin-dot" id="dot1"></div>
+    <div class="pin-dot" id="dot2"></div>
+    <div class="pin-dot" id="dot3"></div>
+    <div class="pin-dot" id="dot4"></div>
+  </div>
+  <div class="numpad">
+    <button onclick="pressKey('1')">1</button>
+    <button onclick="pressKey('2')">2</button>
+    <button onclick="pressKey('3')">3</button>
+    <button onclick="pressKey('4')">4</button>
+    <button onclick="pressKey('5')">5</button>
+    <button onclick="pressKey('6')">6</button>
+    <button onclick="pressKey('7')">7</button>
+    <button onclick="pressKey('8')">8</button>
+    <button onclick="pressKey('9')">9</button>
+    <button onclick="clearPin()">Clear</button>
+    <button onclick="pressKey('0')">0</button>
+    <button onclick="submitPin()">Enter</button>
+  </div>
+</div>
+
+<!-- Page 2: Birthday Message -->
+<div id="messageScreen" class="screen hidden">
+  <canvas id="confettiCanvas" class="confetti"></canvas>
+  <div class="wish-container">
+    <h1 class="blackpink">🎉 HAPPY BIRTHDAY!! 🎉</h1>
+    <p id="line1" class="typed-line"></p>
+    <p id="line2" class="typed-line"></p>
+    <p id="line3" class="typed-line"></p>
+    <p id="line4" class="typed-line"></p>
+  </div>
+  <audio id="birthdaySong" src="birthday.mp3" preload="auto"></audio>
+</div>
+
+<script>
+  let currentPin = "";
+
+  function updatePinDisplay() {
+    for (let i = 1; i <= 4; i++) {
+      document.getElementById('dot' + i).textContent = currentPin[i - 1] || "";
+    }
+  }
+
+  function pressKey(num) {
+    if (currentPin.length < 4) {
+      currentPin += num;
+      updatePinDisplay();
+      if (currentPin.length === 4) {
+        setTimeout(submitPin, 300);
+      }
+    }
+  }
+
+  function clearPin() {
+    currentPin = "";
+    updatePinDisplay();
+  }
+
+  function submitPin() {
+    if (currentPin === "1234") {
+      document.getElementById("pinScreen").classList.add("hidden");
+      document.getElementById("messageScreen").classList.remove("hidden");
+      document.getElementById("birthdaySong").play();
+      playConfetti();
+      typeWish();
+    } else {
+      alert("PIN salah! Cuba lagi.");
+      clearPin();
+    }
+  }
+
+  const wishes = [
+    "Semoga diberkahi umur 🎂",
+    "Diberikan kesihatan yang berpanjangan 💪",
+    "Dipermudahkan segala urusan ✨",
+    "Diberkahi dunia dan akhirat 🌈"
+  ];
+
+  function typeWish() {
+    wishes.forEach((line, i) => {
+      setTimeout(() => {
+        const lineElem = document.getElementById(`line${i + 1}`);
+        lineElem.textContent = line;
+        lineElem.style.animationDelay = `${i * 2}s`;
+        lineElem.style.animationPlayState = 'running';
+      }, i * 2000);
+    });
+  }
+
+  function playConfetti() {
+    const canvas = document.getElementById('confettiCanvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const confetti = [];
+    for (let i = 0; i < 150; i++) {
+      confetti.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height - canvas.height,
+        r: Math.random() * 6 + 4,
+        d: Math.random() * 50 + 10,
+        color: `hsl(${Math.random() * 360}, 100%, 70%)`,
+        tilt: Math.floor(Math.random() * 10) - 10
+      });
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      confetti.forEach(p => {
+        ctx.beginPath();
+        ctx.lineWidth = p.r / 2;
+        ctx.strokeStyle = p.color;
+        ctx.moveTo(p.x + p.tilt + p.r / 4, p.y);
+        ctx.lineTo(p.x + p.tilt, p.y + p.r);
+        ctx.stroke();
+      });
+      update();
+    }
+
+    function update() {
+      confetti.forEach(p => {
+        p.y += Math.cos(p.d) + 1 + p.r / 2;
+        p.x += Math.sin(p.d);
+        if (p.y > canvas.height) {
+          p.y = -10;
+          p.x = Math.random() * canvas.width;
+        }
+      });
+    }
+
+    (function animate() {
+      requestAnimationFrame(animate);
+      draw();
+    })();
+  }
+</script>
+</body>
+</html>
